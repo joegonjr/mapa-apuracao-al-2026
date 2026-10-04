@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apuração de governador em Alagoas — 1º turno de 2026</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, sans-serif; color: #173044; background: #f2f5f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { background: #103249; color: white; padding: 14px 22px; }
+    h1 { font-size: 1.48rem; margin: 0 0 5px; }
+    header p { margin: 0; color: #d4e5ee; }
+    main { display: grid; grid-template-columns: minmax(420px, 1.35fr) minmax(360px, .85fr); gap: 12px; padding: 12px; max-width: 1600px; margin: auto; }
+    .card { background: white; border: 1px solid #d9e2e8; border-radius: 13px; box-shadow: 0 2px 8px #10283d0a; }
+    .map-card { padding: 14px; }
+    .detail-card { padding: 16px; overflow: auto; max-height: calc(100vh - 110px); }
+    .topline { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; width: 100%; }
+    .actions input { width: 100%; min-width: 0; }
+    .button-group { display: inline-flex; gap: 6px; white-space: nowrap; }
+    .button-group button { padding: 8px 9px; font-size: .84rem; }
+    .kpi { font-size: 1.18rem; font-weight: 700; }
+    .small { font-size: .86rem; color: #526978; line-height: 1.45; }
+    .note { background: #edf4f8; border-left: 3px solid #417694; padding: 9px 12px; margin: 12px 0; }
+    .warning { background: #fff3db; border-left-color: #c78e25; }
+    input { border: 1px solid #b9cbd6; border-radius: 8px; padding: 9px 11px; width: min(100%, 300px); font: inherit; }
+    button { border: 1px solid #2a688a; border-radius: 8px; padding: 9px 12px; background: #22698d; color: white; cursor: pointer; font: inherit; }
+    button.secondary { background: white; color: #22698d; }
+    button:disabled { opacity: .5; cursor: default; }
+    svg { width: 100%; max-height: clamp(240px, 42vh, 480px); margin-top: 4px; }
+    path.municipio { stroke: #f9fcfd; stroke-width: 1.6; cursor: pointer; transition: stroke-width .12s; }
+    path.municipio:hover, path.municipio.selecionado { stroke: #142c3b; stroke-width: 3.2; }
+    .legenda { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .83rem; color: #486477; }
+    .rampa { height: 12px; width: 155px; border-radius: 10px; background: linear-gradient(90deg,#e6edf2,#9ecbd6,#337a9b,#12415c); }
+    h2 { margin: 0 0 10px; font-size: 1.23rem; }
+    h3 { margin: 20px 0 7px; font-size: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .table-scroll { overflow-x: auto; }
+    .votes-table { min-width: 500px; }
+    th, td { padding: 7px 6px; border-bottom: 1px solid #e5ecef; text-align: left; }
+    td.num, th.num { text-align: right; white-space: nowrap; }
+    .pill { display: inline-block; border-radius: 999px; background: #e7f0f5; padding: 4px 9px; font-size: .84rem; margin: 3px 5px 3px 0; }
+    details { border: 1px solid #dbe4e9; border-radius: 8px; margin: 8px 0; padding: 8px 10px; }
+    summary { cursor: pointer; font-weight: 600; }
+    .section-list { line-height: 1.55; font-size: .88rem; word-break: break-word; margin: 9px 0 2px; }
+    footer { max-width: 1600px; margin: 0 auto 30px; padding: 0 20px; }
+    a { color: #185d83; }
+    .comparacao { border-top: 1px solid #d9e2e8; margin-top: 10px; padding-top: 10px; }
+    .comparacao-cabecalho { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 10px; }
+    .comparacao-cabecalho h2 { margin: 0; font-size: 1rem; }
+    #diferenca-votos { font-size: .95rem; }
+    .comparacao h3 { margin: 10px 0 5px; }
+    .comparacao p { margin: 7px 0; }
+    .ajuda { position: relative; display: inline-flex; cursor: help; border: 1px solid #b9cbd6; border-radius: 50%; width: 20px; height: 20px; align-items: center; justify-content: center; background: white; color: #185d83; padding: 0; font-size: .8rem; }
+    .tooltip { display: none; position: absolute; bottom: 26px; right: 0; width: min(290px, 70vw); padding: 10px; border-radius: 8px; background: #103249; color: white; font-size: .82rem; line-height: 1.4; z-index: 2; text-align: left; font-weight: normal; }
+    .ajuda:hover .tooltip, .ajuda:focus .tooltip { display: block; }
+    #atualizacao:empty { display: none; }
+    .seletores { display: flex; flex-wrap: wrap; gap: 12px; }
+    .seletores label { flex: 1 1 210px; font-size: .9rem; }
+    .seletores select { display: block; width: 100%; margin-top: 5px; padding: 9px; border: 1px solid #b9cbd6; border-radius: 8px; background: white; font: inherit; }
+    @media(max-width: 920px) { main { grid-template-columns: 1fr; } .detail-card { max-height: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Apuração para governador de Alagoas · 1º turno de 2026</h1>
+    <p>Material acadêmico independente · Dados públicos do TSE e malha do IBGE · Apuração parcial, sem vínculo institucional com o TSE.</p>
+  </header>
+  <main>
+    <section class="card map-card" aria-label="Mapa dos municípios de Alagoas">
+      <div class="topline">
+        <div>
+          <div id="estado" class="kpi"></div>
+          <div id="timestamp" class="small"></div>
+        </div>
+        <div class="actions">
+          <input id="busca" type="search" list="lista-municipios" placeholder="Buscar município" aria-label="Buscar município">
+          <datalist id="lista-municipios"></datalist>
+          <div class="button-group">
+            <button id="limpar" class="secondary" type="button" disabled>Limpar seleção</button>
+            <button id="atualizar" type="button">Atualizar dados</button>
+          </div>
+        </div>
+      </div>
+      <div id="atualizacao" class="small" role="status" aria-live="polite"></div>
+      <svg id="mapa" viewBox="0 0 940 650" role="img" aria-label="Municípios de Alagoas coloridos pelo percentual de seções totalizadas"></svg>
+      <div class="legenda"><span>0%</span><span class="rampa"></span><span>100% das seções totalizadas</span><button type="button" class="ajuda" aria-label="Como ler o mapa" aria-describedby="ajuda-mapa">?<span id="ajuda-mapa" class="tooltip" role="tooltip">A cor representa somente o andamento da totalização. Clique em um município para consultar os números e quais seções já têm arquivos de urna recebidos.</span></button></div>
+      <section class="comparacao" aria-labelledby="titulo-comparacao">
+        <div class="comparacao-cabecalho"><h2 id="titulo-comparacao">Comparar votos de dois candidatos</h2><div id="diferenca-votos" aria-live="polite"><strong>Diferença (1 − 2):</strong> —</div></div>
+        <div class="seletores">
+          <label>Candidato 1<select id="candidato-1"></select></label>
+          <label>Candidato 2<select id="candidato-2"></select></label>
+        </div>
+        <div id="resultado-comparacao" aria-live="polite"></div>
+        <p class="small">Diferença = votos do candidato 1 − votos do candidato 2. Os pontos percentuais usam o total de votos válidos do local. Comparação do retrato apurado, sem projeção dos votos pendentes.</p>
+      </section>
+    </section>
+    <section class="card detail-card" id="painel" aria-live="polite"></section>
+  </main>
+  <footer class="small">
+    <p><strong>Como ler:</strong> “Totalizadas” e “pendentes” são contagens oficiais do acompanhamento estadual (EA15), divulgadas também por município. A lista individual (EA16) informa a chegada dos arquivos de urna, sem indicar se cada seção já foi totalizada. Assim, a lista nominal exata das seções pendentes não pode ser deduzida deste retrato. Os votos vêm dos arquivos municipais EA20, cujo horário pode diferir do EA15. Seções agregadas aparecem junto da principal; a contagem oficial considera a urna principal. O botão “Atualizar dados” consulta novamente o TSE nesta página; ao reabrir o arquivo, volta o retrato salvo em disco.</p>
+    <p>Fontes: <a href="https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados">documentação técnica TSE 2026</a>, <a href="https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea15-arquivo-de-acompanhamento-uf">EA15</a>, <a href="https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea16-arquivo-de-configuracao-de-secoes-eleitorais">EA16</a>, <a href="https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea18-arquivo-auxiliar-de-secao">EA18</a>, <a href="https://www.tse.jus.br/eleicoes/eleicoes-2026-content/arquivos/divulgacao-de-resultados/tse-ea20-arquivo-de-resultado-unificado">EA20</a> e <a href="https://servicodados.ibge.gov.br/api/v3/malhas/estados/27?formato=application/vnd.geo%2Bjson&amp;qualidade=minima&amp;intrarregiao=municipio">malha municipal do IBGE</a>.</p>
+    <p>Arquivos para conferência: <a href="apuracao_municipios_al_2026.csv">municípios CSV</a> · <a href="recebimento_secoes_al_2026.csv">recebimento por seção CSV</a> · <a href="votos_governador_municipios_al_2026.csv">votos por município CSV</a> · <a href="dados_apuracao_al_2026.json">dados JSON</a>.</p>
+  </footer>
+  <script>
+    let dados = /*DADOS_JSON*/;
+    let municipios = new Map(dados.municipios.map(m => [m.codigo_tse, m]));
+    let selecionado = null;
+    const formato = new Intl.NumberFormat('pt-BR');
+    const texto = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const formatar = n => formato.format(n);
+    const percentualVoto = (votos, total) => total > 0
+      ? `${(100 * votos / total).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}%`
+      : '—';
+    const cinza = '#e6edf2';
+    function prepararComparacao() {
+      ['candidato-1', 'candidato-2'].forEach((id, indice) => {
+        const seletor = document.getElementById(id);
+        const anterior = seletor.value;
+        seletor.innerHTML = '<option value="">Selecione um candidato</option>' + dados.candidatos.map(c => `<option value="${texto(c.numero)}">${texto(c.numero)} · ${texto(c.nome)}</option>`).join('');
+        seletor.value = dados.candidatos.some(c => String(c.numero) === anterior) ? anterior : '';
+        seletor.onchange = mostrarComparacao;
+      });
+    }
+    function mostrarComparacao() {
+      mostrarAnaliseMunicipal();
+      const destino = document.getElementById('resultado-comparacao');
+      const destaque = document.getElementById('diferenca-votos');
+      destaque.innerHTML = '<strong>Diferença (1 − 2):</strong> —';
+      const numero1 = document.getElementById('candidato-1').value;
+      const numero2 = document.getElementById('candidato-2').value;
+      const local = selecionado ? municipios.get(selecionado) : dados.estadual;
+      const nomeLocal = selecionado ? local.municipio : 'Alagoas';
+      const titulo = `<h3>${texto(nomeLocal)}</h3>`;
+      if (!numero1 || !numero2) { destino.innerHTML = titulo + '<p>Selecione dois candidatos para comparar.</p>'; return; }
+      if (numero1 === numero2) { destino.innerHTML = titulo + '<p>Selecione candidatos diferentes para comparar.</p>'; return; }
+      const candidatos = [numero1, numero2].map(n => dados.candidatos.find(c => String(c.numero) === n));
+      const votos = [numero1, numero2].map(n => local.votos_por_candidato[n] || 0);
+      const diferenca = votos[0] - votos[1];
+      const assinado = n => (n > 0 ? '+' : '') + formatar(n);
+      destaque.innerHTML = `<strong>Diferença (1 − 2):</strong> ${assinado(diferenca)} votos`;
+      const pontos = local.votos_validos > 0 ? (diferenca > 0 ? '+' : '') + (100 * diferenca / local.votos_validos).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' p.p.' : '— (sem votos válidos)';
+      const resumo = diferenca === 0 ? 'Os dois candidatos têm a mesma quantidade de votos neste retrato.' : `${texto(candidatos[diferenca > 0 ? 0 : 1].nome)} tem ${formatar(Math.abs(diferenca))} voto(s) a mais neste retrato.`;
+      destino.innerHTML = titulo + `<div class="table-scroll"><table><thead><tr><th>Candidato</th><th class="num">Votos</th><th class="num">% válidos</th></tr></thead><tbody>${candidatos.map((c, i) => `<tr><td>${i + 1}. ${texto(c.nome)}</td><td class="num">${formatar(votos[i])}</td><td class="num">${percentualVoto(votos[i], local.votos_validos)}</td></tr>`).join('')}</tbody></table></div><p>Diferença nos votos válidos: <strong>${pontos}</strong></p><p>${resumo}</p><div class="small">EA20: ${texto(selecionado ? `${local.data_resultado} ${local.hora_resultado}` : dados.geracao_estadual)} · ${formatar(local.secoes_no_arquivo_de_votos)} seções totalizadas no arquivo de votos.</div>`;
+    }
+    function mostrarAnaliseMunicipal() {
+      const painel = document.getElementById('analise-municipal');
+      if (!painel || selecionado) return;
+      const numeros = ['candidato-1', 'candidato-2'].map(id => document.getElementById(id).value);
+      const candidatos = numeros.map(n => dados.candidatos.find(c => String(c.numero) === n));
+      const titulo = '<h3>Onde cada candidato está à frente</h3>';
+      if (candidatos.some(c => !c) || numeros[0] === numeros[1]) {
+        painel.innerHTML = titulo + '<p class="small">Selecione dois candidatos diferentes nos seletores do mapa para ver os municípios e o saldo positivo de cada um.</p>';
+        return;
+      }
+      const grupos = [[], []];
+      const empates = [], semVotos = [];
+      for (const m of dados.municipios) {
+        const votos = numeros.map(n => m.votos_por_candidato[n] || 0);
+        const saldo = votos[0] - votos[1];
+        if (!(m.votos_validos > 0)) { semVotos.push(m.municipio); continue; }
+        if (saldo === 0) { empates.push(m.municipio); continue; }
+        grupos[saldo > 0 ? 0 : 1].push({m, saldo: Math.abs(saldo)});
+      }
+      painel.innerHTML = titulo + '<p class="small">Comparação somente entre os dois selecionados. Saldo + = votos do candidato menos os votos do outro naquele município; não indica vitória sobre todos os candidatos nem resultado definitivo.</p>' + grupos.map((grupo, i) => {
+        grupo.sort((a, b) => b.saldo - a.saldo || a.m.municipio.localeCompare(b.m.municipio, 'pt-BR'));
+        const saldoTotal = grupo.reduce((soma, item) => soma + item.saldo, 0);
+        return `<h3>${texto(candidatos[i].nome)}</h3><div class="small">À frente em ${formatar(grupo.length)} município(s) · Soma dos saldos positivos: <strong>+${formatar(saldoTotal)} votos</strong></div>` + (grupo.length ? `<div class="table-scroll"><table><thead><tr><th>Município</th><th class="num">Saldo + (votos)</th></tr></thead><tbody>${grupo.map(({m, saldo}) => `<tr><td>${texto(m.municipio)}</td><td class="num">+${formatar(saldo)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small">Nenhum município com vantagem neste retrato.</p>');
+      }).join('') + `<details><summary>Empates: ${formatar(empates.length)} município(s)</summary><p class="small">${texto(empates.join(', ') || 'Nenhum.')}</p></details><details><summary>Sem votos válidos apurados: ${formatar(semVotos.length)} município(s)</summary><p class="small">${texto(semVotos.join(', ') || 'Nenhum.')}</p></details><p class="small">Os saldos usam os arquivos municipais EA20, cujos horários aparecem ao selecionar cada município. A soma municipal pode diferir do resultado estadual por diferenças de atualização.</p>`;
+    }
+    prepararComparacao();
+    function cor(p) {
+      if (p <= 0) return cinza;
+      if (p < .25) return '#bed9df';
+      if (p < .5) return '#83b8c8';
+      if (p < .75) return '#4e96b0';
+      if (p < 1) return '#257594';
+      return '#12415c';
+    }
+    function mostrarResumo() {
+      document.getElementById('estado').textContent = `Alagoas: ${formatar(dados.estadual.totalizadas)} de ${formatar(dados.estadual.total)} seções totalizadas; ${formatar(dados.estadual.pendentes)} pendentes`;
+      document.getElementById('timestamp').textContent = `Andamento estadual e municipal do TSE (EA15): ${dados.geracao_acompanhamento} · Captura: ${new Date(dados.captura_fim).toLocaleString('pt-BR')}`;
+    }
+    mostrarResumo();
+    const mapa = document.getElementById('mapa');
+    for (const m of dados.municipios) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', dados.malha_svg[m.codigo_ibge] || '');
+      path.setAttribute('class','municipio');
+      path.setAttribute('fill', cor(m.secoes_totalizadas / m.secoes_total));
+      path.setAttribute('fill-rule','evenodd');
+      path.setAttribute('data-codigo', m.codigo_tse);
+      path.setAttribute('tabindex','0');
+      path.setAttribute('aria-label', `${m.municipio}: ${m.secoes_totalizadas} de ${m.secoes_total} seções totalizadas`);
+      const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent = `${m.municipio}: ${m.secoes_totalizadas}/${m.secoes_total} seções totalizadas`;
+      path.appendChild(title);
+      path.addEventListener('click', () => selecionar(m.codigo_tse, true));
+      path.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selecionar(m.codigo_tse, true); } });
+      mapa.appendChild(path);
+    }
+    mapa.addEventListener('click', e => { if (e.target === mapa) limparSelecao(); });
+    const lista = document.getElementById('lista-municipios');
+    for (const m of dados.municipios) { const o = document.createElement('option'); o.value = m.municipio; lista.appendChild(o); }
+    const busca = document.getElementById('busca');
+    const botaoLimpar = document.getElementById('limpar');
+    botaoLimpar.addEventListener('click', limparSelecao);
+    busca.addEventListener('input', () => {
+      if (!busca.value.trim()) { limparSelecao(); return; }
+      const normalizar = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const alvo = normalizar(busca.value.trim());
+      const m = dados.municipios.find(x => normalizar(x.municipio) === alvo);
+      if (m) selecionar(m.codigo_tse, false);
+    });
+    function agrupadas(m, filtro) {
+      const porZona = new Map();
+      for (const s of m.secoes.filter(filtro)) {
+        if (!porZona.has(s.zona)) porZona.set(s.zona, []);
+        porZona.get(s.zona).push(s);
+      }
+      if (!porZona.size) return '<p class="small">Nenhuma seção nesta situação.</p>';
+      return [...porZona].map(([zona, secoes]) => `<details><summary>Zona ${texto(zona)} · ${secoes.length} seção(ões)</summary><div class="section-list">${secoes.map(s => `<span>${texto(s.secao)}${s.agregadas ? ` (agregadas: ${texto(s.agregadas)})` : ''}</span>`).join(', ')}</div></details>`).join('');
+    }
+    function limparSelecao() {
+      selecionado = null;
+      mostrarComparacao();
+      busca.value = '';
+      botaoLimpar.disabled = true;
+      document.querySelectorAll('path.municipio').forEach(p => p.classList.remove('selecionado'));
+      const e = dados.estadual;
+      const percentual = (100 * e.totalizadas / e.total).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      const iniciados = dados.municipios.filter(m => m.secoes_totalizadas > 0).length;
+      const linhas = dados.candidatos.map(c => {
+        const votos = e.votos_por_candidato[c.numero] || 0;
+        return `<tr><td class="num">${texto(c.numero)}</td><td>${texto(c.nome)}</td><td class="num">${formatar(votos)}</td><td class="num">${percentualVoto(votos, e.votos_total)}</td><td class="num">${percentualVoto(votos, e.votos_validos)}</td></tr>`;
+      }).join('');
+      document.getElementById('painel').innerHTML = `
+        <h2>Alagoas · visão geral</h2>
+        <div class="small">1º turno de 2026 · Andamento do TSE (EA15) gerado em ${texto(dados.geracao_acompanhamento)}</div>
+        <div><span class="pill">${formatar(e.totalizadas)} totalizadas</span><span class="pill">${formatar(e.pendentes)} pendentes</span><span class="pill">${formatar(e.total)} no total</span></div>
+        <p>${percentual}% das seções totalizadas · ${formatar(iniciados)} de ${formatar(dados.municipios.length)} municípios com totalização iniciada.</p>
+        <h3>Votos já totalizados para governador em AL</h3>
+        <div class="small">Resultado estadual (EA20) gerado em ${texto(dados.geracao_estadual)}, com ${formatar(e.secoes_no_arquivo_de_votos)} seções totalizadas naquele arquivo.</div>
+        <div class="table-scroll"><table class="votes-table"><thead><tr><th class="num">Número</th><th>Candidato</th><th class="num">Votos</th><th class="num">% dos votos</th><th class="num">% válidos</th></tr></thead><tbody>${linhas}</tbody></table></div>
+        <div class="small">Total apurado: ${formatar(e.votos_total)} · Válidos: ${formatar(e.votos_validos)} · Brancos: ${formatar(e.votos_brancos)} · Nulos: ${formatar(e.votos_nulos)}. Os percentuais usam, respectivamente, o total apurado e os votos válidos como denominador.</div>
+        <div class="note">Clique em um município no mapa ou use a busca para consultar suas seções. As contagens de seções (EA15) e os votos (EA20) podem ter horários de geração diferentes.</div>
+        <section id="analise-municipal" aria-live="polite"></section>`;
+      mostrarAnaliseMunicipal();
+    }
+    function selecionar(codigo, alternar = false) {
+      if (alternar && selecionado === codigo) { limparSelecao(); return; }
+      const m = municipios.get(codigo);
+      if (!m) return;
+      selecionado = codigo;
+      mostrarComparacao();
+      botaoLimpar.disabled = false;
+      document.querySelectorAll('path.municipio').forEach(p => p.classList.toggle('selecionado', p.dataset.codigo === codigo));
+      busca.value = m.municipio;
+      const linhas = dados.candidatos.map(c => {
+        const votos = m.votos_por_candidato[c.numero] || 0;
+        return `<tr><td class="num">${texto(c.numero)}</td><td>${texto(c.nome)}</td><td class="num">${formatar(votos)}</td><td class="num">${percentualVoto(votos, m.votos_total)}</td><td class="num">${percentualVoto(votos, m.votos_validos)}</td></tr>`;
+      }).join('');
+      document.getElementById('painel').innerHTML = `
+        <h2>${texto(m.municipio)}</h2>
+        <div class="small">Código TSE ${texto(m.codigo_tse)} · Andamento de ${texto(dados.geracao_acompanhamento)}</div>
+        <div><span class="pill">${formatar(m.secoes_totalizadas)} totalizadas</span><span class="pill">${formatar(m.secoes_pendentes)} pendentes</span><span class="pill">${formatar(m.secoes_total)} no total</span></div>
+        <div class="note">O TSE informa quantas seções faltam neste município. A lista por seção informa a chegada de arquivos da urna, que é uma etapa distinta da totalização. Por isso, ela não identifica nominalmente todas as ${formatar(m.secoes_pendentes)} seções pendentes.</div>
+        <h3>Votos já totalizados para governador</h3>
+        <div class="small">Arquivo de votação municipal (EA20) gerado em ${texto(m.data_resultado)} ${texto(m.hora_resultado)}, com ${formatar(m.secoes_no_arquivo_de_votos)} seções totalizadas naquele arquivo.</div>
+        <div class="table-scroll"><table class="votes-table"><thead><tr><th class="num">Número</th><th>Candidato</th><th class="num">Votos</th><th class="num">% dos votos</th><th class="num">% válidos</th></tr></thead><tbody>${linhas}</tbody></table></div>
+        <div class="small">Total apurado: ${formatar(m.votos_total)} · Válidos: ${formatar(m.votos_validos)} · Brancos: ${formatar(m.votos_brancos)} · Nulos: ${formatar(m.votos_nulos)}. Os percentuais usam, respectivamente, o total apurado e os votos válidos como denominador.</div>
+        <h3>Seções sem arquivo de urna recebido no EA16</h3>
+        <div class="small">Lista de seções gerada em ${texto(dados.geracao_secoes)}.</div>
+        <div class="small">${formatar(m.secoes_sem_arquivo_recebido)} seções principais. Elas não devem ser confundidas com a contagem oficial de pendentes acima.</div>
+        ${agrupadas(m, s => s.arquivo_recebido === 'não')}
+        <h3>Seções com arquivo de urna recebido no EA16</h3>
+        <div class="small">${formatar(m.secoes_com_arquivo_recebido)} seções principais. O recebimento não confirma que o voto já entrou na totalização.</div>
+        ${agrupadas(m, s => s.arquivo_recebido === 'sim')}`;
+    }
+    limparSelecao();
+
+    function votosDoResultado(resultado) {
+      const cargo = resultado.carg.find(c => String(c.cd) === '3');
+      if (!cargo) throw new Error('O resultado municipal não contém o cargo de governador.');
+      const votos = {};
+      const nomes = {};
+      for (const agrupamento of cargo.agr || []) {
+        for (const partido of agrupamento.par || []) {
+          for (const candidato of partido.cand || []) {
+            const numero = String(candidato.n);
+            votos[numero] = Number(candidato.vap);
+            nomes[numero] = candidato.nmu;
+          }
+        }
+      }
+      if (Object.values(votos).reduce((a, b) => a + b, 0) !== Number(resultado.v.vv)) {
+        throw new Error(`A soma dos votos não confere no município ${resultado.cdabr}.`);
+      }
+      return {votos, nomes};
+    }
+    function redesenharMapa() {
+      document.querySelectorAll('path.municipio').forEach(path => {
+        const m = municipios.get(path.dataset.codigo);
+        path.setAttribute('fill', cor(m.secoes_totalizadas / m.secoes_total));
+        path.setAttribute('aria-label', `${m.municipio}: ${m.secoes_totalizadas} de ${m.secoes_total} seções totalizadas`);
+        path.querySelector('title').textContent = `${m.municipio}: ${m.secoes_totalizadas}/${m.secoes_total} seções totalizadas`;
+      });
+    }
+    async function obter(url) {
+      const resposta = await fetch(url, {cache: 'no-store', mode: 'cors'});
+      if (!resposta.ok) throw new Error(`TSE respondeu ${resposta.status} para ${url}`);
+      return resposta.json();
+    }
+    async function atualizarDados() {
+      const botao = document.getElementById('atualizar');
+      const aviso = document.getElementById('atualizacao');
+      botao.disabled = true;
+      aviso.textContent = 'Consultando o TSE...';
+      try {
+        const [acompanhamento, configuracao, estadual] = await Promise.all([
+          obter(dados.fontes.acompanhamento),
+          obter(dados.fontes.secoes),
+          obter(dados.fontes.estadual)
+        ]);
+        if (String(acompanhamento.f).toLowerCase() !== 'o' || String(configuracao.f).toLowerCase() !== 'o') {
+          throw new Error('Os arquivos consultados não estão marcados como oficiais.');
+        }
+        const situacoes = new Map(acompanhamento.abr.filter(a => a.tpabr === 'mun').map(a => [a.cdabr, a]));
+        const uf = acompanhamento.abr.find(a => a.tpabr === 'uf');
+        if (!uf || situacoes.size !== dados.municipios.length) throw new Error('A lista de municípios está incompleta.');
+        const secoes = new Map();
+        for (const municipio of configuracao.abr.find(a => a.cd === 'al').mu) {
+          const lista = [];
+          for (const zona of municipio.zon) {
+            for (const secao of zona.sec) {
+              if (secao.nsp) continue;
+              lista.push({codigo_tse: municipio.cd, municipio: municipio.nm,
+                zona: zona.cd, secao: secao.ns, agregadas: (secao.nsa || []).join(', '),
+                arquivo_recebido: secao.da ? 'sim' : 'não',
+                data_recebimento: secao.da || '', hora_recebimento: secao.ha || ''});
+            }
+          }
+          lista.sort((a, b) => a.zona.localeCompare(b.zona) || a.secao.localeCompare(b.secao));
+          secoes.set(municipio.cd, lista);
+        }
+        const codigos = dados.municipios.map(m => m.codigo_tse);
+        const resultados = new Map();
+        for (let i = 0; i < codigos.length; i += 4) {
+          const lote = codigos.slice(i, i + 4);
+          const retornos = await Promise.all(lote.map(codigo =>
+            obter(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al${codigo}-c0003-e006259-u.json`)));
+          lote.forEach((codigo, indice) => resultados.set(codigo, retornos[indice]));
+          aviso.textContent = `Consultando os resultados municipais: ${resultados.size} de ${codigos.length}...`;
+          if (i + 4 < codigos.length) await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        const municipiosNovos = dados.municipios.map(m => {
+          const situacao = situacoes.get(m.codigo_tse);
+          const resultado = resultados.get(m.codigo_tse);
+          const lista = secoes.get(m.codigo_tse);
+          if (!situacao || !resultado || !lista || lista.length !== Number(situacao.s.ts)) {
+            throw new Error(`Os arquivos do município ${m.municipio} não conferem.`);
+          }
+          const {votos} = votosDoResultado(resultado);
+          const comArquivo = lista.filter(s => s.arquivo_recebido === 'sim').length;
+          return {...m, secoes_total: Number(situacao.s.ts),
+            secoes_totalizadas: Number(situacao.s.st), secoes_pendentes: Number(situacao.s.snt),
+            secoes_com_arquivo_recebido: comArquivo,
+            secoes_sem_arquivo_recebido: lista.length - comArquivo,
+            secoes_no_arquivo_de_votos: Number(resultado.s.st),
+            data_resultado: resultado.dg, hora_resultado: resultado.hg,
+            votos_total: Number(resultado.v.tv), votos_validos: Number(resultado.v.vv), votos_brancos: Number(resultado.v.vb),
+            votos_nulos: Number(resultado.v.vn), votos_por_candidato: votos, secoes: lista};
+        });
+        const soma = municipiosNovos.reduce((n, m) => n + m.secoes_totalizadas, 0);
+        if (soma !== Number(uf.s.st)) throw new Error('As contagens municipais não fecham com o total estadual.');
+        const {votos: votosEstaduais, nomes} = votosDoResultado(estadual);
+        dados = {...dados, captura_fim: new Date().toISOString(),
+          geracao_acompanhamento: `${acompanhamento.dg} ${acompanhamento.hg}`,
+          geracao_secoes: `${configuracao.dg} ${configuracao.hg}`,
+          geracao_estadual: `${estadual.dg} ${estadual.hg}`,
+          estadual: {total: Number(uf.s.ts), totalizadas: Number(uf.s.st), pendentes: Number(uf.s.snt),
+            secoes_no_arquivo_de_votos: Number(estadual.s.st), votos_por_candidato: votosEstaduais,
+            votos_total: Number(estadual.v.tv), votos_validos: Number(estadual.v.vv), votos_brancos: Number(estadual.v.vb),
+            votos_nulos: Number(estadual.v.vn)},
+          candidatos: Object.keys(nomes).sort((a, b) => Number(a) - Number(b)).map(numero => ({numero, nome: nomes[numero]})),
+          municipios: municipiosNovos};
+        municipios = new Map(dados.municipios.map(m => [m.codigo_tse, m]));
+        prepararComparacao();
+        mostrarResumo();
+        redesenharMapa();
+        if (selecionado) selecionar(selecionado); else limparSelecao();
+        aviso.textContent = '';
+      } catch (erro) {
+        aviso.textContent = `Não foi possível atualizar: ${erro.message}. O mapa mantém os dados anteriores.`;
+      } finally {
+        botao.disabled = false;
+      }
+    }
+    document.getElementById('atualizar').addEventListener('click', atualizarDados);
+  </script>
+</body>
+</html>
