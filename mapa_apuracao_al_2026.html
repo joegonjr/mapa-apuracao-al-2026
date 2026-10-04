@@ -119,7 +119,8 @@
         const seletor = document.getElementById(id);
         const anterior = seletor.value;
         seletor.innerHTML = '<option value="">Selecione um candidato</option>' + dados.candidatos.map(c => `<option value="${texto(c.numero)}">${texto(c.numero)} · ${texto(c.nome)}</option>`).join('');
-        seletor.value = dados.candidatos.some(c => String(c.numero) === anterior) ? anterior : '';
+        const padrao = indice === 0 ? '45' : '15'; // JHC e Renan Filho
+        seletor.value = dados.candidatos.some(c => String(c.numero) === anterior) ? anterior : (dados.candidatos.some(c => String(c.numero) === padrao) ? padrao : '');
         seletor.onchange = mostrarComparacao;
       });
     }
@@ -398,6 +399,7 @@
       }
     }
     document.getElementById('atualizar').addEventListener('click', atualizarDados);
+    atualizarDados();
   </script>
 </body>
 </html>

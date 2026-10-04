@@ -25,7 +25,7 @@ EA15 informa o andamento da totalização; EA16 informa recebimento de arquivos 
 
 Abra index.html ou mapa_apuracao_al_2026.html. No GitHub Pages, publique a branch main a partir da pasta raiz (/).
 
-O botão “Atualizar dados” consulta o TSE no navegador e atualiza apenas a sessão atual, sujeito à disponibilidade e às permissões de acesso do servidor. Reabrir a página restaura o retrato publicado. Os downloads CSV/JSON correspondem ao retrato salvo, não às consultas feitas apenas no navegador.
+Ao abrir a página, uma atualização é iniciada automaticamente, com JHC como candidato 1 e Renan Filho como candidato 2. O botão “Atualizar dados” permite repetir a consulta ao TSE no navegador e atualiza apenas a sessão atual, sujeito à disponibilidade e às permissões de acesso do servidor. O retrato publicado é mostrado inicialmente e permanece disponível se a consulta falhar. Os downloads CSV/JSON correspondem ao retrato salvo, não às consultas feitas apenas no navegador.
 
 Para gerar outro retrato salvo, execute `python mapa_apuracao_al.py` com Python 3 e conexão à internet (somente biblioteca padrão), ou use atualizar_mapa.cmd no Windows. Depois publique os arquivos gerados em um novo commit. O template HTML preserva as funcionalidades nas novas gerações.
 
